@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnFirst Delay Setting Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .test-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        input, button {
+            padding: 8px 12px;
+            margin: 4px 8px 4px 0;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+        }
+        
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .success { color: #38ef7d; }
+        .error { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🕒 Tab Delay Setting Test</h1>
+        
+        <div class="test-section">
+            <h3>Current Extension Status</h3>
+            <div id="current-status" class="status">Loading...</div>
+            <button onclick="checkCurrentStatus()">Refresh Status</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Delay Setting</h3>
+            <p>Enter a new delay value and test if it's saved correctly:</p>
+            
+            <label>New Delay (seconds):</label>
+            <input type="number" id="delayInput" value="10" min="1" max="30">
+            <button onclick="setDelay()">Set Delay</button>
+            
+            <div id="delay-result" class="status" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Verification Test</h3>
+            <p>After setting a delay, click this button to verify it was saved:</p>
+            <button onclick="verifyDelay()">Verify Current Delay</button>
+            <div id="verify-result" class="status" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Instructions</h3>
+            <ol>
+                <li><strong>Check current status</strong> - See what delay is currently set</li>
+                <li><strong>Set new delay</strong> - Try setting it to 10 seconds</li>
+                <li><strong>Verify setting</strong> - Check if the new delay was saved</li>
+                <li><strong>Test in popup</strong> - Open the extension popup to see if it shows 10</li>
+                <li><strong>Test tab delay</strong> - Open a new tab to see if it uses 10-second delay</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function checkCurrentStatus() {
+            const statusDiv = document.getElementById('current-status');
+            statusDiv.innerHTML = 'Checking...';
+            
+            try {
+                if (!chrome || !chrome.runtime) {
+                    statusDiv.innerHTML = '<span class="error">❌ Extension not loaded</span>';
+                    return;
+                }
+                
+                const status = await chrome.runtime.sendMessage({ action: 'getStatus' });
+                
+                if (status) {
+                    statusDiv.innerHTML = `
+                        <span class="success">✅ Extension Status</span><br>
+                        🎯 Progress: ${status.currentProgress}/${status.dailyGoal}<br>
+                        ⏱️ Current Delay: <strong>${status.timeRemaining/1000} seconds</strong><br>
+                        🚦 Throttling: ${status.isThrottling ? 'ON' : 'OFF'}<br>
+                        🏆 Goals Completed: ${status.goalCompleted ? 'Yes' : 'No'}
+                    `;
+                } else {
+                    statusDiv.innerHTML = '<span class="error">❌ No response from extension</span>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function setDelay() {
+            const delayInput = document.getElementById('delayInput');
+            const resultDiv = document.getElementById('delay-result');
+            const newDelay = parseInt(delayInput.value);
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Setting delay...';
+            
+            if (newDelay < 1 || newDelay > 30) {
+                resultDiv.innerHTML = '<span class="error">❌ Delay must be between 1-30 seconds</span>';
+                return;
+            }
+            
+            try {
+                const response = await chrome.runtime.sendMessage({ 
+                    action: 'setDelay',
+                    delay: newDelay * 1000
+                });
+                
+                if (response && response.success) {
+                    resultDiv.innerHTML = `<span class="success">✅ Delay set to ${newDelay} seconds!</span>`;
+                    
+                    // Auto-refresh status after setting
+                    setTimeout(checkCurrentStatus, 500);
+                } else {
+                    resultDiv.innerHTML = '<span class="error">❌ Failed to set delay</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function verifyDelay() {
+            const resultDiv = document.getElementById('verify-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Verifying...';
+            
+            try {
+                // Get status from background script
+                const status = await chrome.runtime.sendMessage({ action: 'getStatus' });
+                
+                // Also check what's stored in chrome.storage
+                const storage = await chrome.storage.local.get(['tabDelay']);
+                
+                const backgroundDelay = status ? status.timeRemaining / 1000 : 'Unknown';
+                const storageDelay = storage.tabDelay ? storage.tabDelay / 1000 : 'Not set';
+                
+                if (backgroundDelay === storageDelay) {
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Delay setting verified!</span><br>
+                        Background script: ${backgroundDelay}s<br>
+                        Storage: ${storageDelay}s<br>
+                        <strong>Both values match! ✓</strong>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <span class="error">❌ Delay setting mismatch!</span><br>
+                        Background script: ${backgroundDelay}s<br>
+                        Storage: ${storageDelay}s<br>
+                        <strong>Values don't match!</strong>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Auto-check status on page load
+        checkCurrentStatus();
+        
+        // Allow Enter key to set delay
+        document.getElementById('delayInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                setDelay();
+            }
+        });
+    </script>
+</body>
+</html>

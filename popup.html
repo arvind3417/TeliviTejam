@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnFirst</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <span class="icon">🎯</span>
+        <h1>LearnFirst</h1>
+      </div>
+      <div class="status-indicator" id="statusIndicator">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <h2>Today's Learning Progress</h2>
+        <div class="goal-display">
+          <span id="currentProgress">0</span>/<span id="dailyGoal">3</span>
+        </div>
+      </div>
+      
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      
+      <div class="progress-message" id="progressMessage">
+        Complete your learning goals to unlock full internet speed!
+      </div>
+    </div>
+
+    <!-- Learning Activities -->
+    <div class="activities-section">
+      <h3>Quick Actions</h3>
+      
+      <div class="activity-buttons">
+        <button class="activity-btn" id="markReadingBtn">
+          📖 Mark Article Read
+        </button>
+        
+        <button class="activity-btn" id="markVideoBtn">
+          🎥 Mark Video Watched
+        </button>
+        
+        <button class="activity-btn" id="markCourseBtn">
+          🎓 Mark Course Progress
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="settings-section">
+      <h3>Settings</h3>
+      
+      <div class="setting-item">
+        <label for="goalInput">Daily Learning Goal:</label>
+        <div class="input-group">
+          <input type="number" id="goalInput" min="1" max="20" value="3">
+          <button id="updateGoalBtn">Update</button>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <label for="delayInput">Tab Delay (seconds):</label>
+        <div class="input-group">
+          <input type="number" id="delayInput" min="1" max="30" value="5">
+          <button id="updateDelayBtn">Update</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Sites -->
+    <div class="sites-section">
+      <h3>Recommended Learning Sites</h3>
+      <div class="learning-sites">
+        <a href="https://wikipedia.org" target="_blank" class="site-link">
+          <span class="site-icon">📚</span>
+          <span>Wikipedia</span>
+        </a>
+        <a href="https://stackoverflow.com" target="_blank" class="site-link">
+          <span class="site-icon">💻</span>
+          <span>Stack Overflow</span>
+        </a>
+        <a href="https://medium.com" target="_blank" class="site-link">
+          <span class="site-icon">✍️</span>
+          <span>Medium</span>
+        </a>
+        <a href="https://coursera.org" target="_blank" class="site-link">
+          <span class="site-icon">🎓</span>
+          <span>Coursera</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="footer-actions">
+      <button id="resetProgressBtn" class="secondary-btn">
+        Reset Today's Progress
+      </button>
+      
+      <button id="viewStatsBtn" class="secondary-btn">
+        View Statistics
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

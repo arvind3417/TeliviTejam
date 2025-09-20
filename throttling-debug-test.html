@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🐌 Throttling Debug Test Page</title>
+    <style>
+        body { 
+            font-family: monospace; 
+            padding: 2rem; 
+            background: #1a1a2e;
+            color: #16213e;
+            color: #eee;
+        }
+        .log-section {
+            background: #16213e;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #0f3460;
+        }
+        .expected-log {
+            background: #0f2027;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+        }
+        .success { border-left-color: #00ff88; }
+        .warning { border-left-color: #ffa500; }
+        .error { border-left-color: #ff4444; }
+        .test-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .test-image {
+            height: 150px;
+            border-radius: 8px;
+            background: #333;
+        }
+        button {
+            background: #0f3460;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: bold;
+        }
+        button:hover { background: #1e5f8b; }
+    </style>
+</head>
+<body>
+    <h1>🐌 LearnFirst Throttling Debug Test</h1>
+    
+    <p><strong>Instructions:</strong> Open DevTools (F12) and watch the Console tab while testing!</p>
+
+    <div class="log-section success">
+        <h3>✅ Expected Logs - Content Throttling Initialization</h3>
+        <div class="expected-log">🐌 Content throttling initialized for: [current URL]
+🐌 Applying content throttling with base delay: [X]ms</div>
+        <p><strong>If missing:</strong> Content throttling injection failed or learning site detected</p>
+    </div>
+
+    <div class="log-section warning">
+        <h3>⚡ Learning Site Bypass (Should NOT See Throttling)</h3>
+        <div class="expected-log">⚡ Learning site detected - no throttling applied</div>
+        <p><strong>Test:</strong> <a href="https://en.wikipedia.org/wiki/Computer_science" target="_blank">Open Wikipedia</a> - should load instantly</p>
+    </div>
+
+    <div class="log-section success">
+        <h3>🖼️ Expected Logs - Image Throttling</h3>
+        <div class="expected-log">🖼️ Image loaded after [X]ms delay
+🖼️ Image loaded after [X]ms delay
+...</div>
+        <button onclick="testImages()">🧪 Load Test Images</button>
+        <div class="test-images" id="imageContainer"></div>
+    </div>
+
+    <div class="log-section success">
+        <h3>📜 Expected Logs - Script Throttling</h3>
+        <div class="expected-log">📜 Script throttling delay applied: [X]ms</div>
+        <button onclick="testScripts()">🧪 Load Test Scripts</button>
+        <div id="scriptStatus"></div>
+    </div>
+
+    <div class="log-section warning">
+        <h3>🚦 Background Script Logs (Check Extension Console)</h3>
+        <div class="expected-log">🌐 LearnFirst: Setting up Manifest V3 compatible throttling...
+✅ Using content-based throttling approach (Manifest V3 compatible)
+🎯 Setting up content-based throttling injection...
+✅ Injected content throttling into tab [ID]</div>
+        <p><strong>Access:</strong> chrome://extensions/ → LearnFirst → "service worker" link</p>
+    </div>
+
+    <div class="log-section error">
+        <h3>❌ Common Issues</h3>
+        <div class="expected-log">⚠️ Could not inject throttling into tab [ID]: Cannot access chrome:// URL</div>
+        <p><strong>Normal for:</strong> chrome://, chrome-extension://, about: pages</p>
+        
+        <div class="expected-log">🚦 Throttling: normal=false, forced=false, current=false</div>
+        <p><strong>Issue:</strong> Goals completed - throttling disabled</p>
+        
+        <div class="expected-log">(No throttling logs at all)</div>
+        <p><strong>Issue:</strong> Extension not loaded or content injection failed</p>
+    </div>
+
+    <div class="log-section success">
+        <h3>🎯 Testing Strategy</h3>
+        <ol>
+            <li><strong>Reload extension</strong> in chrome://extensions/</li>
+            <li><strong>Open this page fresh</strong> (Ctrl+R)</li>
+            <li><strong>Check console immediately</strong> for initialization logs</li>
+            <li><strong>Test image loading</strong> - should see delays + placeholders</li>
+            <li><strong>Check for banner</strong> - "Slow connection mode" should appear</li>
+            <li><strong>Test learning site</strong> - Wikipedia should bypass all throttling</li>
+        </ol>
+    </div>
+
+    <script>
+        console.log('🧪 Debug test page loaded:', new Date().toISOString());
+        console.log('🔍 Waiting for LearnFirst content throttling to initialize...');
+        
+        let testImageCount = 0;
+        
+        function testImages() {
+            const container = document.getElementById('imageContainer');
+            console.log('🧪 Testing image throttling...');
+            
+            container.innerHTML = '';
+            for (let i = 1; i <= 4; i++) {
+                const img = document.createElement('img');
+                img.src = `https://picsum.photos/200/150?random=${Date.now()}-${i}`;
+                img.className = 'test-image';
+                img.onload = () => {
+                    console.log(`✅ Test image ${i} loaded (${img.src})`);
+                };
+                img.onerror = () => {
+                    console.log(`❌ Test image ${i} failed to load`);
+                };
+                container.appendChild(img);
+            }
+        }
+        
+        function testScripts() {
+            console.log('🧪 Testing script throttling...');
+            const status = document.getElementById('scriptStatus');
+            status.innerHTML = '<p>🔄 Loading external script...</p>';
+            
+            const script = document.createElement('script');
+            script.src = `https://code.jquery.com/jquery-3.6.0.min.js?_=${Date.now()}`;
+            script.onload = () => {
+                console.log('✅ External script loaded successfully');
+                status.innerHTML = '<p style="color: #00ff88;">✅ Script loaded</p>';
+            };
+            script.onerror = () => {
+                console.log('❌ External script failed to load');
+                status.innerHTML = '<p style="color: #ff4444;">❌ Script failed</p>';
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Monitor for LearnFirst throttling injection
+        setTimeout(() => {
+            if (window.learnFirstDelayInjected || document.querySelector('#throttling-styles')) {
+                console.log('✅ LearnFirst throttling components detected');
+            } else {
+                console.log('❌ No LearnFirst throttling detected - check extension status');
+            }
+        }, 2000);
+        
+        // Auto-load some test content
+        setTimeout(() => {
+            testImages();
+        }, 1000);
+    </script>
+</body>
+</html>

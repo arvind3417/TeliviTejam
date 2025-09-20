@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🧪 Tab Delay Test - Should Show Overlay</title>
+    <style>
+        body { 
+            font-family: monospace; 
+            padding: 2rem; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 3rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Tab Delay Injection Test</h1>
+        
+        <div class="status">
+            <h3>Expected Behavior:</h3>
+            <p>This page should have loaded with a <strong>5-second black overlay</strong> with countdown.</p>
+            <p>If no overlay appeared, the script injection is not working.</p>
+        </div>
+        
+        <div class="status">
+            <h3>Debug Steps:</h3>
+            <p>1. Open DevTools (F12)</p>
+            <p>2. Check Console tab for LearnFirst logs</p>
+            <p>3. Look for these specific logs:</p>
+            <ul style="text-align: left; margin-top: 1rem;">
+                <li>🚀 LearnFirst: handleTabDelay CALLED</li>
+                <li>🧪 About to inject script</li>
+                <li>🧪 executeScript API available</li>
+                <li>✅ Script injection SUCCESS</li>
+                <li>🎯 INJECTED FUNCTION STARTED</li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <h3>Missing Logs Mean:</h3>
+            <p><strong>No handleTabDelay logs:</strong> Extension not loaded or throttling disabled</p>
+            <p><strong>No injection logs:</strong> Script execution failing</p>
+            <p><strong>No injected function logs:</strong> Function not executing in page context</p>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🧪 Test page loaded:', new Date().toISOString());
+        console.log('🧪 Looking for LearnFirst extension logs...');
+        
+        // Check if extension injected anything
+        setTimeout(() => {
+            const overlay = document.getElementById('learnfirst-delay-overlay');
+            if (overlay) {
+                console.log('✅ Overlay found! Extension working.');
+            } else {
+                console.log('❌ No overlay found. Extension may not be working.');
+            }
+        }, 6000); // Check after expected delay time
+    </script>
+</body>
+</html>

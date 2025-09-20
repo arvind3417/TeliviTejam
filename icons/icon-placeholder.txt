@@ -1,0 +1,26 @@
+ICON PLACEHOLDER FILES NEEDED:
+
+Please create the following PNG icon files in this directory:
+
+- icon-16.png  (16x16 pixels)
+- icon-32.png  (32x32 pixels) 
+- icon-48.png  (48x48 pixels)
+- icon-128.png (128x128 pixels)
+
+SUGGESTED ICON DESIGN:
+- Theme: Learning/Education with speed/throttling concept
+- Colors: Blue/Purple gradient (matches extension theme)
+- Symbol Ideas: 
+  * Target (🎯) with book/reading element
+  * Speedometer with book/graduation cap
+  * Brain with Wi-Fi signal bars
+  * Book with timer/clock element
+
+TEMPORARY SOLUTION:
+Until you create proper icons, you can:
+1. Use any PNG files renamed to the required sizes
+2. Use online icon generators (favicon.io, iconpng.com)
+3. Convert emoji to PNG using tools like emoji-to-png
+
+The extension will work without custom icons (browsers will use defaults), 
+but custom icons improve the professional appearance.

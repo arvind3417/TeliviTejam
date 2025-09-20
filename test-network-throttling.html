@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🌐 Network Throttling Test - LearnFirst</title>
+    <style>
+        body { 
+            font-family: monospace; 
+            padding: 2rem; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .method {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+        .old { border-left-color: #ffaa00; }
+        .new { border-left-color: #00ff88; }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: bold;
+        }
+        .test-image {
+            width: 100px;
+            height: 100px;
+            background: #333;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        .log {
+            background: rgba(0,0,0,0.5);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        .status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .status.throttled { background: rgba(255,100,100,0.3); }
+        .status.fast { background: rgba(100,255,100,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Network Throttling vs Tab Delays</h1>
+        
+        <div id="currentStatus" class="status">
+            <span id="statusText">Checking throttling status...</span>
+        </div>
+        
+        <div class="comparison">
+            <div class="method old">
+                <h3>❌ OLD: Tab Delays Only</h3>
+                <p><strong>What it did:</strong></p>
+                <ul>
+                    <li>Showed 5-second visual overlay</li>
+                    <li>Page loaded normally underneath</li>
+                    <li>No actual speed reduction</li>
+                    <li>Easy to ignore/bypass</li>
+                </ul>
+            </div>
+            
+            <div class="method new">
+                <h3>✅ NEW: True Network Throttling</h3>
+                <p><strong>What it does:</strong></p>
+                <ul>
+                    <li>Delays ALL network requests</li>
+                    <li>Images load slower</li>
+                    <li>Scripts delay execution</li>
+                    <li>Simulates slow internet</li>
+                </ul>
+                <p><strong>BUT:</strong> Learning sites (Wikipedia, Stack Overflow) load fast!</p>
+            </div>
+        </div>
+        
+        <h3>🧪 Test Current Throttling:</h3>
+        <button onclick="loadTestImages()">Load Test Images</button>
+        <button onclick="loadTestScripts()">Load Test Scripts</button>
+        <button onclick="openLearningSpeed()">Test Learning Site Speed</button>
+        <button onclick="openRegularSpeed()">Test Regular Site Speed</button>
+        
+        <div id="testResults"></div>
+        
+        <h3>📊 Network Request Log:</h3>
+        <div id="networkLog" class="log">Waiting for network requests...</div>
+        
+        <h3>⚙️ How It Works Now:</h3>
+        <div class="method">
+            <p><strong>Regular websites (Reddit, YouTube, etc.):</strong></p>
+            <ul>
+                <li>Main pages: 2-second delay per request</li>
+                <li>Images: 0.8-second delay each</li>
+                <li>CSS/JS: 1.2-1.3 second delays</li>
+                <li>AJAX requests: 0.5-second delay</li>
+            </ul>
+            
+            <p><strong>Learning websites (Wikipedia, GitHub, etc.):</strong></p>
+            <ul>
+                <li>⚡ NO DELAYS - Full speed access!</li>
+                <li>Incentivizes educational browsing</li>
+            </ul>
+        </div>
+        
+        <h3>🎛️ Throttling Intensity:</h3>
+        <p>Based on your tab delay setting: <span id="currentDelay">5000ms</span></p>
+        <p>Network delays calculated as: baseDelay = tabDelay / 5</p>
+        
+        <div class="method">
+            <strong>Current Settings:</strong>
+            <ul id="delayBreakdown"></ul>
+        </div>
+    </div>
+    
+    <script>
+        let networkLog = document.getElementById('networkLog');
+        let logEntries = [];
+        
+        function addLogEntry(message) {
+            logEntries.unshift(`${new Date().toLocaleTimeString()}: ${message}`);
+            if (logEntries.length > 50) logEntries.pop();
+            networkLog.innerHTML = logEntries.join('\n');
+        }
+        
+        async function checkThrottlingStatus() {
+            try {
+                chrome.runtime.sendMessage({ action: 'getStatus' }, (response) => {
+                    if (response) {
+                        const statusDiv = document.getElementById('currentStatus');
+                        const statusText = document.getElementById('statusText');
+                        
+                        if (response.isThrottling) {
+                            statusDiv.className = 'status throttled';
+                            statusText.textContent = `🐌 THROTTLING ACTIVE - ${response.currentProgress}/${response.dailyGoal} goals completed`;
+                        } else {
+                            statusDiv.className = 'status fast';
+                            statusText.textContent = `⚡ FULL SPEED - Goals completed (${response.currentProgress}/${response.dailyGoal})`;
+                        }
+                        
+                        document.getElementById('currentDelay').textContent = `${response.throttleDelay}ms`;
+                        
+                        // Show delay breakdown
+                        const baseDelay = response.throttleDelay / 5;
+                        const breakdown = document.getElementById('delayBreakdown');
+                        breakdown.innerHTML = `
+                            <li>Main pages: ${baseDelay * 2}ms delay</li>
+                            <li>CSS files: ${baseDelay * 1.2}ms delay</li>
+                            <li>JavaScript: ${baseDelay * 1.3}ms delay</li>
+                            <li>Images: ${baseDelay * 0.8}ms delay</li>
+                            <li>AJAX: ${baseDelay * 0.5}ms delay</li>
+                        `;
+                    }
+                });
+            } catch (error) {
+                addLogEntry('❌ Extension not available');
+            }
+        }
+        
+        function loadTestImages() {
+            addLogEntry('🖼️ Loading test images...');
+            const testDiv = document.getElementById('testResults');
+            testDiv.innerHTML = '<h4>Loading Images (watch for delays):</h4>';
+            
+            // Load multiple images to test throttling
+            for (let i = 1; i <= 5; i++) {
+                const img = document.createElement('img');
+                img.src = `https://picsum.photos/100/100?random=${i}`;
+                img.className = 'test-image';
+                img.onload = () => addLogEntry(`✅ Image ${i} loaded`);
+                img.onerror = () => addLogEntry(`❌ Image ${i} failed`);
+                testDiv.appendChild(img);
+            }
+        }
+        
+        function loadTestScripts() {
+            addLogEntry('📜 Loading external scripts...');
+            const script = document.createElement('script');
+            script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+            script.onload = () => addLogEntry('✅ jQuery loaded');
+            script.onerror = () => addLogEntry('❌ jQuery failed');
+            document.head.appendChild(script);
+        }
+        
+        function openLearningSpeed() {
+            addLogEntry('📚 Opening learning site (should be fast)...');
+            window.open('https://en.wikipedia.org/wiki/Computer_science', '_blank');
+        }
+        
+        function openRegularSpeed() {
+            addLogEntry('🐌 Opening regular site (should be slow)...');
+            window.open('https://example.com', '_blank');
+        }
+        
+        // Check status on load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkThrottlingStatus();
+            addLogEntry('🧪 Test page loaded');
+            
+            // Update status every 5 seconds
+            setInterval(checkThrottlingStatus, 5000);
+        });
+        
+        // Log when images start loading
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.tagName === 'IMG') {
+                        addLogEntry(`🔄 Starting to load: ${node.src}`);
+                    }
+                });
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🌐 Manifest V3 Compatible Throttling Test</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .method {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+        .old { border-left-color: #ff4444; }
+        .new { border-left-color: #00ff88; }
+        .warning { background: rgba(255,150,0,0.2); border-left-color: #ffa500; }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        button:hover { background: #0066a3; }
+        .test-area {
+            background: rgba(0,0,0,0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .test-image {
+            width: 100%;
+            height: 150px;
+            background: #333;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Manifest V3 Compatible Internet Throttling</h1>
+        
+        <div class="comparison">
+            <div class="method old">
+                <h3>❌ Manifest V2 (Old)</h3>
+                <p><strong>webRequestBlocking:</strong></p>
+                <ul>
+                    <li>Could intercept ALL network requests</li>
+                    <li>Add real delays to downloads</li>
+                    <li>True network speed reduction</li>
+                    <li>❌ Not allowed in Manifest V3</li>
+                    <li>❌ Security/performance concerns</li>
+                </ul>
+            </div>
+            
+            <div class="method new">
+                <h3>✅ Manifest V3 (Current)</h3>
+                <p><strong>Content-Based Throttling:</strong></p>
+                <ul>
+                    <li>✅ Tab delay overlays (5 seconds)</li>
+                    <li>✅ Image loading delays with placeholders</li>
+                    <li>✅ Visual "slow connection" indicators</li>
+                    <li>✅ Script loading notifications</li>
+                    <li>✅ Learning sites bypass all delays</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="method warning">
+            <h3>⚠️ Important: Manifest V3 Limitations</h3>
+            <p>Chrome extensions can no longer block network requests for security reasons. Our approach creates the <strong>perception</strong> of slow internet through:</p>
+            <ul>
+                <li>🔄 Visual delays and loading indicators</li>
+                <li>🖼️ Delayed image appearance (with loading placeholders)</li>
+                <li>📱 "Slow connection" notifications</li>
+                <li>⏱️ Tab loading delays</li>
+            </ul>
+            <p><strong>Result:</strong> Browsing <em>feels</em> slow and annoying, encouraging learning!</p>
+        </div>
+
+        <div class="test-area">
+            <h3>🧪 Test Content Throttling:</h3>
+            <button onclick="loadTestImages()">Load Images (Should Be Slow)</button>
+            <button onclick="addTestScripts()">Load Scripts (Loading Indicators)</button>
+            <button onclick="showThrottleIndicator()">Show Slow Connection Banner</button>
+            <button onclick="openWikipedia()">Test Learning Site (Fast!)</button>
+            
+            <div class="image-grid" id="imageContainer">
+                <!-- Test images will load here with delays -->
+            </div>
+            
+            <div id="scriptStatus"></div>
+        </div>
+
+        <div class="method">
+            <h3>⚙️ How It Works:</h3>
+            <p><strong>1. Tab Delays:</strong> 5-second overlay on new tabs/reloads</p>
+            <p><strong>2. Image Throttling:</strong> Images show loading placeholders, then load with delay</p>
+            <p><strong>3. Script Delays:</strong> Loading notifications for external scripts</p>
+            <p><strong>4. Smart Bypass:</strong> Learning sites (Wikipedia, Stack Overflow) get full speed</p>
+            <p><strong>5. Visual Feedback:</strong> "Slow connection" banners and loading animations</p>
+        </div>
+
+        <div class="method">
+            <h3>🎯 User Experience:</h3>
+            <ul>
+                <li>📱 <strong>Feels annoying</strong> - just like slow internet</li>
+                <li>🎓 <strong>Learning sites fast</strong> - creates positive incentive</li>
+                <li>⚡ <strong>Goals completed</strong> - everything returns to normal speed</li>
+                <li>🔧 <strong>Configurable delays</strong> - adjust intensity via popup</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let imageCount = 0;
+        
+        function loadTestImages() {
+            const container = document.getElementById('imageContainer');
+            container.innerHTML = '<p>🔄 Loading images with throttling delays...</p>';
+            
+            // Simulate the image throttling that content script would apply
+            for (let i = 1; i <= 6; i++) {
+                const img = document.createElement('img');
+                img.className = 'test-image';
+                img.style.background = 'linear-gradient(45deg, #f0f0f0, #e0e0e0)';
+                img.style.backgroundSize = '20px 20px';
+                img.style.animation = 'pulse 1s infinite';
+                
+                // Add loading placeholder text
+                img.alt = `Loading image ${i}...`;
+                img.title = 'Content throttling active';
+                
+                container.appendChild(img);
+                
+                // Simulate throttled loading (like content script would do)
+                setTimeout(() => {
+                    img.src = `https://picsum.photos/200/150?random=${Date.now()}-${i}`;
+                    img.style.background = '';
+                    img.style.animation = '';
+                    console.log(`🖼️ Image ${i} "loaded" after throttling delay`);
+                }, 500 * i); // Staggered delays
+            }
+        }
+        
+        function addTestScripts() {
+            const status = document.getElementById('scriptStatus');
+            status.innerHTML = `
+                <div style="background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                    🔄 Loading scripts... (throttling simulation)
+                </div>
+            `;
+            
+            setTimeout(() => {
+                status.innerHTML = `
+                    <div style="background: rgba(0,150,0,0.8); color: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                        ✅ Scripts loaded after throttling delay
+                    </div>
+                `;
+            }, 2000);
+        }
+        
+        function showThrottleIndicator() {
+            // Simulate the slow connection banner that content script shows
+            const indicator = document.createElement('div');
+            indicator.innerHTML = '🐌 Slow connection mode - Complete learning goals for faster browsing!';
+            indicator.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; 
+                background: linear-gradient(45deg, #ff6b6b, #ffa500); 
+                color: white; padding: 12px; text-align: center; 
+                font-weight: bold; z-index: 10000;
+                font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+                animation: slideDown 0.5s ease-out;
+            `;
+            
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => indicator.remove(), 1000);
+            }, 4000);
+        }
+        
+        function openWikipedia() {
+            alert('🚀 Opening Wikipedia - this would load at FULL SPEED (no throttling on learning sites)!');
+            window.open('https://en.wikipedia.org/wiki/Computer_science', '_blank');
+        }
+        
+        // Add some basic animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 0.6; }
+                50% { opacity: 1; }
+                100% { opacity: 0.6; }
+            }
+            
+            @keyframes slideDown {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Log for debugging
+        console.log('🧪 Manifest V3 throttling test page loaded');
+        console.log('💡 This demonstrates the content-based approach used instead of webRequestBlocking');
+    </script>
+</body>
+</html>
